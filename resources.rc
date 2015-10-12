@@ -1,0 +1,7 @@
+ID_BMP_IMG_BIT_VALUE    BITMAP resources\imgBitValue.bmp
+ID_BMP_IMG_BIT_VALUE_0  BITMAP resources\imgBitValue0.bmp
+ID_BMP_IMG_BIT_VALUE_1  BITMAP resources\imgBitValue1.bmp
+ID_REPORT_SETTINGS_XML  RCDATA resources\report_settings.xml
+ID_SIAMS_REPORT_LIB     RCDATA resources\SiamsReportLib.oxt
+ID_SIAMS_REPORT_BUILDER RCDATA resources\SiamsReportBuilder.oxt
+ID_CRANE_CARRIAGE       RCDATA resources\CraneCarriage1.bmp

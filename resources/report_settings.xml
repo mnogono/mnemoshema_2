@@ -1,0 +1,8 @@
+<settings>
+	<setting name="TemplateFile" value="{$template}">
+		<property name="AsTemplate" value="False"/>
+		<property name="Hidden" value="True"/>
+	</setting>
+	<setting name="DataFile" value="{$data}"/>
+	<setting name="OutputFile" value="{$odt}" type="ODT"/>
+</settings>

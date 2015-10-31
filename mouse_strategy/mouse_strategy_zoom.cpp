@@ -43,7 +43,7 @@ void __fastcall TMouseStrategyZoom::OnChartZoom(TObject *Sender) {
 
 	TSensorsTabSheet *activePage = static_cast<TSensorsTabSheet *>(chartPageControl->ActivePage);
 
-	activePage->timeAxis->SetTimeAxisBounds(/*Sender, */chart->BottomAxis->Minimum, chart->BottomAxis->Maximum);
+	activePage->timeAxis->SetTimeAxisBounds(chart->BottomAxis->Minimum, chart->BottomAxis->Maximum, true);
 }
 
 //---------------------------------------------------------------------------

@@ -28,9 +28,11 @@ void CreateHTTPRequestPool() {
 }
 
 //---------------------------------------------------------------------------
+/*
 void CreateFileRequestPool() {
 	FILE_REQUEST_POOL = new sysPatterns::TPool<TTaskRequestFileData>();
 }
+*/
 
 //---------------------------------------------------------------------------
 void CreateDeviceFileRequestPool() {
@@ -48,14 +50,23 @@ void CreateDeviceEventFileFormatRequestPool() {
 }
 
 //---------------------------------------------------------------------------
-void CreateFileEventRequestPool() {
-	//sensorEventRequestPool = new sysPatterns::TPool<TTaskRequestFileEventData>();
+void CreateMnemoshemaDataHistoryRequestPool() {
+	MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL = new sysPatterns::TPool<TTaskRequestMnemoshemaDataHistory>();
 }
 
 //---------------------------------------------------------------------------
+/*
+void CreateFileEventRequestPool() {
+	//sensorEventRequestPool = new sysPatterns::TPool<TTaskRequestFileEventData>();
+}
+*/
+
+//---------------------------------------------------------------------------
+/*
 void CreateSensorDataPool() {
 	//sensorDataPool = new sysPatterns::TPool<TSensorData>();
 }
+*/
 
 //---------------------------------------------------------------------------
 __fastcall TFormMnemoshemaMain::TFormMnemoshemaMain(TComponent* Owner) : TForm(Owner) {
@@ -133,29 +144,42 @@ void __fastcall TFormMnemoshemaMain::FormCreate(TObject *Sender) {
 	//CreateRequestPool();
 	CreateHTTPRequestPool();
 
-	CreateFileRequestPool();
+	//CreateFileRequestPool();
 
 	//CreateDeviceFileRequestPool();
 
-	CreateFileEventRequestPool();
+	//CreateFileEventRequestPool();
 
 	CreateDeviceFileFormatRequestPool();
 
 	CreateDeviceEventFileFormatRequestPool();
 
+	CreateMnemoshemaDataHistoryRequestPool();
+
 	int dataFileFormat = DataModuleMP->GetSettingInt("data_file_format");
+	if (dataFileFormat == DATA_FILE_FORMAT_DEVICE) {
+		REQUEST_TIME_RANGE_DATA = &RequestTimeRangeDataFileFormatDevice;
+	} else {
+		sysLogger::ERR_A("unsupport data file format");
+		assert(dataFileFormat != DATA_FILE_FORMAT_DEVICE);
+	}
+
+	REQUEST_MNEMOSHEMA_DATA = &RequestMnemoshemaData;
+
+	/*
 	if (dataFileFormat == DATA_FILE_FORMAT_SENSOR) {
 		REQUEST_TIME_RANGE_DATA = &RequestTimeRangeDataFileFormatSensor;
 
 	} else if (dataFileFormat == DATA_FILE_FORMAT_DEVICE) {
 		REQUEST_TIME_RANGE_DATA = &RequestTimeRangeDataFileFormatDevice;
 	}
+	*/
 
 	sysLogger::PROFILE_A("create request pools");
 
-	CreateSensorDataPool();
+	//CreateSensorDataPool();
 
-	sysLogger::PROFILE_A("create sensor data pool");
+	//sysLogger::PROFILE_A("create sensor data pool");
 
 	CreateStringGridEvents();
 
@@ -243,15 +267,12 @@ static void callback(sysThread::TThreadTask *task) {
 	int observerableType = taskRequestData->GetObserverableType();
 
 	if (observerableType == TObserverableTypes::DEVICE_HTTP_DATA) {
-		//httpRequestPool->Release(static_cast<TTaskRequestHTTPData *>(taskRequestData));
 		HTTP_REQUEST_POOL->Release(static_cast<TTaskRequestHTTPData *>(taskRequestData));
 
 	} else if (observerableType == TObserverableTypes::SENSOR_FILE_DATA) {
-		//fileRequestPool->Release(static_cast<TTaskRequestFileData *>(taskRequestData));
-		FILE_REQUEST_POOL->Release(static_cast<TTaskRequestFileData *>(taskRequestData));
+		//FILE_REQUEST_POOL->Release(static_cast<TTaskRequestFileData *>(taskRequestData));
 
 	} else if (observerableType == TObserverableTypes::DEVICE_FILE_DATA) {
-		//deviceFileRequestPool->Release(static_cast<TTaskRequestDeviceFileData *>(taskRequestData));
 
 	} else if (observerableType == TObserverableTypes::SENSOR_FILE_EVENT_DATA) {
 		//sensorEventRequestPool->Release(static_cast<TTaskRequestFileEventData *>(taskRequestData));
@@ -261,6 +282,9 @@ static void callback(sysThread::TThreadTask *task) {
 
 	} else if (observerableType == TObserverableTypes::DEVICE_FILE_EVENT_DATA_FORMAT) {
 		DEVICE_EVENT_DATA_FILE_FORMAT_REQUEST_POOL->Release(static_cast<TTaskRequestDeviceEventDataFileFormat *>(taskRequestData));
+
+	} else if (observerableType == TObserverableTypes::MNEMOSHEMA_DATA_HISTORY) {
+		MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL->Release(static_cast<TTaskRequestMnemoshemaDataHistory *>(taskRequestData));
 
 	} else {
 		sysLogger::ERR_A("task request data unknown observerable type:");
@@ -283,6 +307,11 @@ void __fastcall TFormMnemoshemaMain::CreateThreadPool() {
 
 //---------------------------------------------------------------------------
 void __fastcall TFormMnemoshemaMain::TimerUpdateHTTPDataTimer(TObject *Sender) {
+	if (FormDashboard->CheckBoxDataHistory->Checked == true) {
+		//offline mnemoshema data display
+		return;
+	}
+
 	for (std::list<TDevice *>::iterator it = DEVICES.begin(), itEnd = DEVICES.end(); it != itEnd; ++it) {
 		std::list<TTaskRequestHTTPData *>::iterator iTask = HTTP_REQUEST_POOL->Get<TTaskRequestHTTPData>();
 
@@ -386,9 +415,7 @@ void __fastcall TFormMnemoshemaMain::MMCloseClick(TObject *Sender) {
 }
 
 //---------------------------------------------------------------------------
-void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatDevice(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT) {
-	//group by device...
-	std::map<TDevice *, std::list<const TSensor *> *> sensorGroup;
+void GroupSensors(std::set<const TSensor *> &sensors, std::map<TDevice *, std::list<const TSensor *> *> &sensorGroup) {
 	for (std::set<const TSensor *>::iterator i = sensors.begin(), iEnd = sensors.end(); i != iEnd; ++i) {
 		const TSensor *sensor = *i;
 		TDevice *device = GetDevice(sensor->device_id);
@@ -401,6 +428,45 @@ void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatDevice(std::set<const TS
 		}
 		sensorGroup[device]->push_back(sensor);
 	}
+}
+
+//---------------------------------------------------------------------------
+void TFormMnemoshemaMain::RequestMnemoshemaData(std::set<const TSensor *> &sensors, double dtGMT) {
+	std::map<TDevice *, std::list<const TSensor *> *> sensorGroup;
+	GroupSensors(sensors, sensorGroup);
+
+	//iterate over device and create request task with list of device require sensor
+	for (std::map<TDevice *, std::list<const TSensor *> *>::iterator i = sensorGroup.begin(), iEnd = sensorGroup.end(); i != iEnd; ++i) {
+		const TDevice *device = i->first;
+		std::list<const TSensor *> *deviceSensors = i->second;
+
+		std::list<TTaskRequestMnemoshemaDataHistory *>::iterator iTask = MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL->Get<TTaskRequestMnemoshemaDataHistory>();
+		TTaskRequestMnemoshemaDataHistory *task = static_cast<TTaskRequestMnemoshemaDataHistory *>(*iTask);
+		task->device = device;
+		task->SetSensors(*deviceSensors);
+		task->dt1GMT = dtGMT;
+		task->dt2GMT = dtGMT;
+		task->resolution = 0;
+
+		if (THREAD_POOL->Contain(task)) {
+			MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL->Release(iTask);
+		} else {
+			THREAD_POOL->Push(task);
+        }
+	}
+
+	//release resource
+	for (std::map<TDevice *, std::list<const TSensor *> *>::iterator i = sensorGroup.begin(), iEnd = sensorGroup.end(); i != iEnd; ++i) {
+		std::list<const TSensor *> *deviceSensors = i->second;
+		delete deviceSensors;
+	}
+}
+
+//---------------------------------------------------------------------------
+void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatDevice(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT, double resolution) {
+	//group by device...
+	std::map<TDevice *, std::list<const TSensor *> *> sensorGroup;
+	GroupSensors(sensors, sensorGroup);
 
 	//iterate over device and create request task with list of device require sensor
 	for (std::map<TDevice *, std::list<const TSensor *> *>::iterator i = sensorGroup.begin(), iEnd = sensorGroup.end(); i != iEnd; ++i) {
@@ -414,6 +480,7 @@ void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatDevice(std::set<const TS
 		task->SetSensors(*deviceSensors);
 		task->dt1GMT.Val = dt1GMT;
 		task->dt2GMT.Val = dt2GMT;
+		task->resolution = resolution;
 
 		if (THREAD_POOL->Contain(task)) {
 			DEVICE_DATA_FILE_FORMAT_REQUEST_POOL->Release(iTask);
@@ -427,28 +494,12 @@ void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatDevice(std::set<const TS
 		std::list<const TSensor *> *deviceSensors = i->second;
 		delete deviceSensors;
 	}
-
-	/*
-	if (record->record_type == RECORD_TYPE_SENSOR) {
-		const TSensor *sensor = static_cast<const TSensor *>(record);
-		device = GetDevice(sensor->device_id);
-		if (device == NULL) {
-			return;
-		}
-	}
-	*/
-	/*
-	else if (record->record_type == RECORD_TYPE_DEVICE) {
-		device = static_cast<const TDevice *>(record);
-	}
-	*/
 }
 
 //---------------------------------------------------------------------------
-void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatSensor(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT) {
+/*
+void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatSensor(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT, double resolution) {
 	const TSensor *sensor = *sensors.begin();
-	//const TSensor *sensor = static_cast<const TSensor *>(record);
-	//std::list<TTaskRequestFileData *>::iterator iTask = fileRequestPool->Get<TTaskRequestFileData>();
 	std::list<TTaskRequestFileData *>::iterator iTask = FILE_REQUEST_POOL->Get<TTaskRequestFileData>();
 
 	TTaskRequestFileData *task = static_cast<TTaskRequestFileData *>(*iTask);
@@ -456,20 +507,13 @@ void TFormMnemoshemaMain::RequestTimeRangeDataFileFormatSensor(std::set<const TS
 	task->dt1GMT.Val = dt1GMT;
 	task->dt2GMT.Val = dt2GMT;
 
-	/*
-	if (threadPool->Contain(task)) {
-		fileRequestPool->Release(iTask);
-	} else {
-		threadPool->Push(task);
-	}
-	*/
 	if (THREAD_POOL->Contain(task)) {
-		//fileRequestPool->Release(iTask);
 		FILE_REQUEST_POOL->Release(iTask);
 	} else {
 		THREAD_POOL->Push(task);
 	}
 }
+*/
 
 //---------------------------------------------------------------------------
 void __fastcall TFormMnemoshemaMain::ApplicationRun() {
@@ -1112,14 +1156,34 @@ void __fastcall TFormMnemoshemaMain::StringGridEventClick(TObject *Sender) {
 		}
 
 		if (textEventFile.IsEmpty() == false) {
-			std::string f = sysFile::ReadFile(textEventFile.c_str());
-			OutputDebugStringA(f.c_str());
 			MemoEventDescription->Text = sysFile::ReadFile(textEventFile.c_str()).c_str();
 		}
 	} catch (Exception &e) {
 		sysLogger::ERR_W(e.Message.c_str());
-	}}
+	}
+}
+
 //---------------------------------------------------------------------------
+void __fastcall TFormMnemoshemaMain::FindSensorClick(TObject *Sender) {
+	//find sensor under context menu
+	String recordUUID = PopupMenuRecordView->PopupComponent->Name;
+	TRecord *record = GetRecord(recordUUID);
+	if (record == NULL) {
+		return;
+	}
 
+	//make visible main device tree, even if filter is enabled
+	TreeViewDeviceFiltered->Visible = false;
+	TreeViewDevice->Visible = true;
 
+	int nodeIndex = FindRecordInTreeViewDevice(TreeViewDevice, record);
+	if (nodeIndex == -1) {
+		ShowMessage(L"Датчик не найден в дереве устройств");
+		return;
+	}
+
+	TreeViewDevice->Select(TreeViewDevice->Items->Item[nodeIndex]);
+	TreeViewDevice->SetFocus();
+}
+//---------------------------------------------------------------------------
 

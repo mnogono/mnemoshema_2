@@ -5,9 +5,9 @@
 #include "login.h"
 #include "mp.h"
 //---------------------------------------------------------------------------
+USEFORM("select_report.cpp", FormReportList);
 USEFORM("signals.cpp", FormSignals);
 USEFORM("reports.cpp", FormReports);
-USEFORM("select_report.cpp", FormReportList);
 USEFORM("login.cpp", FormLogin);
 USEFORM("db_module.cpp", DataModuleMP); /* TDataModule: File Type */
 USEFORM("debug.cpp", FormDebug);
@@ -63,9 +63,4 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 	return 0;
 }
 //---------------------------------------------------------------------------
-
-
-
-
-
 

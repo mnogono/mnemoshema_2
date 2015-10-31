@@ -47,10 +47,6 @@ void TRecordViewEdit::CreateControls() {
 		viewControl = new TEdit(parent);
 		viewControl->Name = record->uuid;
 		viewControl->Parent = parent;
-		/*
-		viewControl->Left = 300;
-		viewControl->Top = 300;
-		*/
 	}
 
 	leftLabel = (TLabel *)sysVCL::FindControl(parent, LABEL_LEFT_PREFIX + record->uuid);
@@ -62,8 +58,6 @@ void TRecordViewEdit::CreateControls() {
 		leftLabel->AutoSize = true;
 		leftLabel->Transparent = true;
 		leftLabel->Alignment = taRightJustify;
-//		leftLabel->Left = viewControl->Left - leftLabel->Width - 5;
-//		leftLabel->Top = viewControl->Top + (viewControl->Height - leftLabel->Height) / 2;
 	}
 
 	rightLabel = (TLabel *)sysVCL::FindControl(parent, LABEL_RIGHT_PREFIX + record->uuid);
@@ -75,8 +69,6 @@ void TRecordViewEdit::CreateControls() {
 		rightLabel->AutoSize = true;
 		rightLabel->Transparent = true;
 		rightLabel->Alignment = taLeftJustify;
-//		rightLabel->Left = viewControl->Left + LABEL_UNIT_WIDTH + viewControl->Width + 5;
-//		rightLabel->Top = viewControl->Top + (viewControl->Height - rightLabel->Height) / 2;
 	}
 
 	unitLabel = (TLabel *)sysVCL::FindControl(parent, LABEL_UNIT_PREFIX + record->uuid);
@@ -87,32 +79,15 @@ void TRecordViewEdit::CreateControls() {
 		unitLabel->Caption = "";
 		unitLabel->AutoSize = true;
 		unitLabel->Transparent = true;
-//		unitLabel->Left = viewControl->Left + viewControl->Width + 5;
-//		unitLabel->Top = viewControl->Top + (viewControl->Height - unitLabel->Height) / 2;
 		unitLabel->Width = LABEL_UNIT_WIDTH;
 	}
 
 	controls.insert(viewControl);
 
-	/*
-	if (std::find(controls.begin(), controls.end(), leftLabel) == controls.end()) {
-		controls.push_back(leftLabel);
-	}
-	*/
 	controls.insert(leftLabel);
 
-	/*
-	if (std::find(controls.begin(), controls.end(), rightLabel) == controls.end()) {
-		controls.push_back(rightLabel);
-	}
-	*/
 	controls.insert(rightLabel);
 
-	/*
-	if (std::find(controls.begin(), controls.end(), unitLabel) == controls.end()) {
-		controls.push_back(unitLabel);
-	}
-	*/
 	controls.insert(unitLabel);
 }
 

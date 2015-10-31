@@ -26,7 +26,5 @@ void __fastcall TChartLabel::Paint(void) {
 
 
 void __fastcall TChartLabel::MouseMove(TShiftState state, int x, int y) {
-	//Parent-> MouseMove(state, x, y);
-	//PostMessageA();
-
 }
+

@@ -11,7 +11,5 @@ class TTaskRequestMnemoshemaData :
 	public:
 		//the function for clean up resources after the task was finished
 		virtual void CleanUp() = 0;
-
-		//virtual TTaskType GetTaskType() = 0;
 };
 #endif

@@ -16,7 +16,6 @@ TRecordView * TSensorViewFactory::Build(
 	if (record->record_type == RECORD_TYPE_SENSOR) {
 		TDevice *device = GetDevice(((TSensor *)record)->device_id);
 		if (device && device->type == "briz") {
-// 			recordView = new TSensorViewEditBriz(parent, record);
 			recordView = new TSensorViewEdit(parent, static_cast<TSensor *>(record));
 		} else {
 			recordView = new TSensorViewEdit(parent, static_cast<TSensor *>(record));

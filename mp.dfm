@@ -173,7 +173,7 @@ object FormMnemoshemaMain: TFormMnemoshemaMain
   end
   object TimerUpdateHTTPData: TTimer
     OnTimer = TimerUpdateHTTPDataTimer
-    Left = 544
+    Left = 584
     Top = 40
   end
   object PopupMenuTreeViewDevice: TPopupMenu
@@ -193,10 +193,6 @@ object FormMnemoshemaMain: TFormMnemoshemaMain
         Caption = #1042#1099#1093#1086#1076
         OnClick = MMCloseClick
       end
-    end
-    object N9: TMenuItem
-      Caption = #1052#1085#1077#1084#1086#1089#1093#1077#1084#1072
-      OnClick = N9Click
     end
     object N8: TMenuItem
       Caption = #1048#1085#1092#1086#1088#1084#1072#1094#1080#1103
@@ -230,8 +226,8 @@ object FormMnemoshemaMain: TFormMnemoshemaMain
   object TimerUpdateEventsData: TTimer
     Interval = 5000
     OnTimer = TimerUpdateEventsDataTimer
-    Left = 544
-    Top = 128
+    Left = 584
+    Top = 96
   end
   object PopupMenuRecordView: TPopupMenu
     Left = 248
@@ -239,6 +235,10 @@ object FormMnemoshemaMain: TFormMnemoshemaMain
     object PMBuildChartForRecordView: TMenuItem
       Caption = #1055#1086#1089#1090#1088#1086#1080#1090#1100' '#1075#1088#1072#1092#1080#1082
       OnClick = PMBuildChartForRecordViewClick
+    end
+    object FindSensor: TMenuItem
+      Caption = #1053#1072#1081#1090#1080' '#1076#1072#1090#1095#1080#1082
+      OnClick = FindSensorClick
     end
   end
   object PopupMenuStringGridEvent: TPopupMenu
@@ -253,7 +253,7 @@ object FormMnemoshemaMain: TFormMnemoshemaMain
       OnClick = PMOpenEventFolderClick
     end
     object PMCreateEventReport: TMenuItem
-      Caption = #1057#1086#1079#1076#1072#1090#1100' '#1087#1086' '#1089#1086#1073#1099#1090#1080#1103#1084' '#1079#1072' '#1076#1077#1085#1100
+      Caption = #1054#1090#1095#1077#1090' '#1087#1086' '#1089#1086#1073#1099#1090#1080#1103#1084' '#1079#1072' '#1076#1077#1085#1100
       OnClick = PMCreateEventReportClick
     end
   end

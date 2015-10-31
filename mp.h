@@ -32,9 +32,9 @@
 #include "request_device_file_data.h"
 #include "request_device_data_file_format.h"
 #include "request_device_event_data_file_format.h"
+#include "request_mnemoshema_data_history.h"
 #include "recordInfo.h"
 #include <Vcl.Menus.hpp>
-//#include "observerable_types.h"
 #include "observerable_history_date_time.h"
 #include <Vcl.Grids.hpp>
 #include "request_file_event_data.h"
@@ -69,7 +69,6 @@ __published:	// IDE-managed Components
 	TMenuItem *MMClose;
 	TMenuItem *N2;
 	TMenuItem *N8;
-	TMenuItem *N9;
 	TMenuItem *N10;
 	TMenuItem *N11;
 	TTimer *TimerUpdateEventsData;
@@ -88,6 +87,7 @@ __published:	// IDE-managed Components
 	TMenuItem *PMCreateEventReport;
 	TMemo *MemoEventDescription;
 	TSplitter *Splitter3;
+	TMenuItem *FindSensor;
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall TimerUpdateHTTPDataTimer(TObject *Sender);
 	void __fastcall FormDestroy(TObject *Sender);
@@ -111,6 +111,7 @@ __published:	// IDE-managed Components
 	void __fastcall CheckBoxEventByDateClick(TObject *Sender);
 	void __fastcall PMOpenEventFolderClick(TObject *Sender);
 	void __fastcall PMCreateEventReportClick(TObject *Sender);
+	void __fastcall FindSensorClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	//http data manager, notify all observer for new sensor data
@@ -142,9 +143,11 @@ public:
 
 	void UpdateData(sysObserverable::IObserverable *data = NULL);
 
-	static void RequestTimeRangeDataFileFormatSensor(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT);
+	//static void RequestTimeRangeDataFileFormatSensor(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT, double resolution);
 
-	static void RequestTimeRangeDataFileFormatDevice(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT);
+	static void RequestMnemoshemaData(std::set<const TSensor *> &sensors, double dtGMT);
+
+	static void RequestTimeRangeDataFileFormatDevice(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT, double resolution);
 
 	void __fastcall BuildChart(const TRecord *record);
 

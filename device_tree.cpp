@@ -407,3 +407,20 @@ void BuildTreeViewDevice(TTreeView *TreeViewDevice) {
 		}
 	}
 }
+
+// ------------------------------------------------------------------------------
+int FindRecordInTreeViewDevice(TTreeView *TreeViewDevice, const TRecord *record) {
+	for (int itItem = 0; itItem < TreeViewDevice->Items->Count; ++itItem) {
+		TTreeNode *sensorNode = TreeViewDevice->Items->Item[itItem];
+
+		if (!sensorNode->Data) {
+			continue;
+		}
+
+		if (static_cast<TRecord*>(sensorNode->Data) == record) {
+            return itItem;
+        }
+	}
+
+	return -1;
+}

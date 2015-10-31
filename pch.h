@@ -86,6 +86,7 @@
 #include "sysReg.h"
 #include "sysThread.h"
 #include "sysLogger.h"
+#include "sysControlState.h"
 #include "sysApp.h"
 #include "sysOO.h"
 #include "sysVCL.h"

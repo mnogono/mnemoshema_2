@@ -11,8 +11,9 @@
 
 #include "mnemoshema_data_manager.h"
 #include "http_data_observer.h"
-#include "file_data_observer.h"
+#include "time_range_data_observer.h"
 #include "device_file_data_observer.h"
+#include "mnemoshema_data_history_observer.h"
 #include "record_view.h"
 #include "SensorView.h"
 #include "SensorViewFactory.h"
@@ -32,9 +33,18 @@ class TFormDashboard :
 {
 __published:	// IDE-managed Components
 	TPageControl *PageControlMP;
+	TPanel *Panel1;
+	TCheckBox *CheckBoxDataHistory;
+	TDateTimePicker *DateDashboardHistory;
+	TDateTimePicker *TimeDashboardHistory;
+	TButton *ButtonRequestDataMnemoshemaHistory;
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall FormDestroy(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
+	void __fastcall CheckBoxDataHistoryClick(TObject *Sender);
+	void __fastcall ButtonRequestDataMnemoshemaHistoryClick(TObject *Sender);
+	void __fastcall DateDashboardHistoryChange(TObject *Sender);
+	void __fastcall TimeDashboardHistoryChange(TObject *Sender);
 private:
 	TCraneMimicPanel *craneMimicPanel;
 
@@ -44,9 +54,11 @@ private:
 public:		// User declarations
 	sysObserver::IObserver *httpDataObserver;
 
-	//sysPatterns::TObserver *fileDataObserver;
+	sysObserver::IObserver *timeRangeDataObserver;
 
-	sysObserver::IObserver *deviceFileDataObserver;
+	sysObserver::IObserver *mnemoshemaDataHistoryObserver;
+
+	//sysObserver::IObserver *deviceFileDataObserver;
 
 	//each record can have several record view control
 	std::map<const TSensor *, std::list<IMnemoshemaView *> *> mshViews;
@@ -64,9 +76,13 @@ public:
 
 	void __fastcall CreateHTTPDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
 
+	void __fastcall CreateTimeRangeDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
+
+	void __fastcall CreateMnemoshemaDataHistoryObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
+
 	//void __fastcall CreateFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
 
-	void __fastcall CreateDeviceFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
+	//void __fastcall CreateDeviceFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
 
 	void InitCreatedRecordView(TSensorView *createdRecordView);
 
@@ -79,6 +95,8 @@ public:
 	void OnTreeViewNodeChange(TTreeNode *node);
 
 	void __fastcall InitializeCraneMimicPanel(TScrollBox *ScrollBoxImage, String &mimePanelBkgImgName);
+
+	void __fastcall RequestDataMnemoshemaHistory();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormDashboard *FormDashboard;

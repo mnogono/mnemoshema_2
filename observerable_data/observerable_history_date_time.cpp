@@ -8,7 +8,9 @@
 
 double TObserverableHistoryDateTime::fLocalTimeBiasInDays = sysTime::GetLocalTimeBias() * sysTime::SEC2DAY;
 
-TObserverableHistoryDateTime::TObserverableHistoryDateTime(double dt1LocalTime, double dt2LocalTime) : dt1LocalTime(dt1LocalTime), dt2LocalTime(dt2LocalTime) {
+TObserverableHistoryDateTime::TObserverableHistoryDateTime(double dt1LocalTime, double dt2LocalTime) :
+	dt1LocalTime(dt1LocalTime),
+	dt2LocalTime(dt2LocalTime) {
 }
 
 int TObserverableHistoryDateTime::GetObserverableType() {

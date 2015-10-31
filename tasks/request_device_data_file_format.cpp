@@ -8,8 +8,9 @@
 
 //---------------------------------------------------------------------------
 TTaskRequestDeviceDataFileFormat::TTaskRequestDeviceDataFileFormat() {
-	//device = NULL;
 	sensors.clear();
+
+	resolution = 0.0;
 }
 
 //---------------------------------------------------------------------------
@@ -135,6 +136,7 @@ void initializeData(const TSensor *sensor) {
 */
 
 //---------------------------------------------------------------------------
+/*
 static void Parse(
 	const wchar_t *pDataFile,
 	size_t dataSize,
@@ -142,6 +144,19 @@ static void Parse(
 	__int64 iTimeGMT2,
 	const TDevice *device,
 	std::set<const TSensor *, TCmpSensorByIndex> &sensors,
+	std::map<const TSensor *, std::list<TSensorData *> *> &data) {
+*/
+
+void TTaskRequestDeviceDataFileFormat::GetOffsets(FILE *f, __int64 fileSize, size_t dataSize, long ms1, long ms2, int &offset1, int &offset2) {
+	offset1 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms1);
+	offset2 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms2);
+}
+
+void TTaskRequestDeviceDataFileFormat::Parse(
+	const wchar_t *pDataFile,
+	size_t dataSize,
+	__int64 iTimeGMT1,
+	__int64 iTimeGMT2,
 	std::map<const TSensor *, std::list<TSensorData *> *> &data) {
 
 	FILE *f = _wfopen(pDataFile, L"rb");
@@ -166,10 +181,11 @@ static void Parse(
 
 	__int64 fileSize = sysFile::GetFileSize64(pDataFile);
 
-	//int dataBlockSize = dataSize + sizeof(long);
 	//find file position of iTimeGMT1 and iTimeGMT2 in file, using binary search
-	int iOffset1 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms1);
-	int iOffset2 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms2);
+	//int iOffset1 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms1);
+	//int iOffset2 = FindPositionByteOffsetInDataFile(f, fileSize, dataSize, ms2);
+	int iOffset1, iOffset2;
+	GetOffsets(f, fileSize, dataSize, ms1, ms2, iOffset1, iOffset2);
 
 	if (iOffset1 == iOffset2 || iOffset2 < iOffset1) {
 		fclose(f);
@@ -198,13 +214,28 @@ static void Parse(
 		//sensors ordered by index!
 		std::set<const TSensor *, TCmpSensorByIndex>::iterator itSensor;
 
+		//milliseconds offset from the file
+		long milliseconds;
+
+		//offset of begining
+		long milliseconds0;
+		memcpy(&milliseconds0, &bytes[0], sizeof(milliseconds0));
+
+		long resolutionMs = resolution * sysTime::DAY2MSEC;
+
+		size_t offset;
+
 		for (int  i = 0; i < count; ++i) {
 			//get milliseconds offset from the file name for the each data block
-			long milliseconds;
 			memcpy(&milliseconds, &bytes[i * dataSize], sizeof(milliseconds));
 
+			if (milliseconds - milliseconds0 < resolutionMs) {
+				continue;
+			}
+			milliseconds0 = milliseconds;
+
 			//skip the milliseconds data
-			size_t offset = sizeof(long);
+			offset = sizeof(long);
 
 			itSensor = sensors.begin();
 			for (std::vector<TDevice::TSensorInfo *>::const_iterator iSensorInfo = device->sensorsInfo.begin(), iSensorInfoEnd = device->sensorsInfo.end(); iSensorInfo != iSensorInfoEnd; ++iSensorInfo) {
@@ -274,7 +305,8 @@ void TTaskRequestDeviceDataFileFormat::Run() {
 			continue;
 		}
 
-		Parse(pDataFile, dataBlockSize, iTimeGMT1, iTimeGMT2, device, sensors, data);
+		//Parse(pDataFile, dataBlockSize, iTimeGMT1, iTimeGMT2, device, sensors, data);
+		Parse(pDataFile, dataBlockSize, iTimeGMT1, iTimeGMT2, data);
 	}
 }
 

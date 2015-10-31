@@ -26,7 +26,7 @@ std::map<String, TRecord *> RECORDS;
 
 sysThread::TThreadPoolBorland<TThreadHTTPDataUISynchronize> *THREAD_POOL;
 
-sysPatterns::TPool<TTaskRequestFileData> *FILE_REQUEST_POOL;
+//sysPatterns::TPool<TTaskRequestFileData> *FILE_REQUEST_POOL;
 
 sysPatterns::TPool<TTaskRequestHTTPData> *HTTP_REQUEST_POOL;
 
@@ -34,7 +34,13 @@ sysPatterns::TPool<TTaskRequestDeviceDataFileFormat> *DEVICE_DATA_FILE_FORMAT_RE
 
 sysPatterns::TPool<TTaskRequestDeviceEventDataFileFormat> *DEVICE_EVENT_DATA_FILE_FORMAT_REQUEST_POOL;
 
+sysPatterns::TPool<TTaskRequestMnemoshemaDataHistory> *MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL;
+
+//ptr function for request time range data using old file format (separate sensor data file for each sensor)
+//or (seperate device data file for each divece)
 RequestTimeRangeData *REQUEST_TIME_RANGE_DATA;
+
+RequestMnemoshemaData *REQUEST_MNEMOSHEMA_DATA;
 
 bool GAUSSIAN_FILTER_ENABLED;
 

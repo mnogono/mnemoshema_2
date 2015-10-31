@@ -21,9 +21,15 @@ void __fastcall TFormSignals::CreateHTTPDataObserver(TMnemoshemaDataManager &mne
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TFormSignals::CreateFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
-	fileDataObserver = new TFileDataObserver(mshViews);
-	mnemoshemaDataManager.AddObserver(fileDataObserver);
+void __fastcall TFormSignals::CreateTimeRangeDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
+	timeRangeDataObserver = new TTimeRangeDataObserver(mshViews);
+	mnemoshemaDataManager.AddObserver(timeRangeDataObserver);
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormSignals::CreateMnemoshemaDataHistoryObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
+	mnemoshemaDataHistoryObserver = new TMnemoshemaDataHistoryObserver(mshViews);
+	mnemoshemaDataManager.AddObserver(mnemoshemaDataHistoryObserver);
 }
 
 //---------------------------------------------------------------------------
@@ -151,7 +157,9 @@ void __fastcall TFormSignals::RestoreLastUserSettings() {
 void __fastcall TFormSignals::SetMnemoshemaDataManager(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	CreateHTTPDataObserver(mnemoshemaDataManager);
 
-	CreateFileDataObserver(mnemoshemaDataManager);
+	CreateTimeRangeDataObserver(mnemoshemaDataManager);
+
+	CreateMnemoshemaDataHistoryObserver(mnemoshemaDataManager);
 }
 
 //---------------------------------------------------------------------------
@@ -168,6 +176,10 @@ void TFormSignals::OnTreeViewNodeChange(TTreeNode *node) {
 		}
 
 		std::list<IMnemoshemaView *> *views = mshViews[sensor];
+		if (views->empty()) {
+			return;
+		}
+
 		TRecordViewStringGridContainer *view = static_cast<TRecordViewStringGridContainer *>(views->front());
 		StringGridSignals->Row = view->row;
 
@@ -186,6 +198,42 @@ void TFormSignals::OnTreeViewNodeChange(TTreeNode *node) {
 				StringGridSignals->Row = view->row;
 			}
 		}
+	} else if (record->record_type == RECORD_TYPE_DEVICE) {
+		const TDevice *device = static_cast<const TDevice *>(record);
+		std::list<TSensor *> sensors = GetSensors(device);
+		if (sensors.empty()) {
+			return;
+		}
+
+		TSensor *frontSensor = sensors.front();
+		TSensor *backSensor = sensors.back();
+
+		TGridRect selection;
+		selection.Left = 0;
+		selection.Right = 2;
+
+		if (mshViews.find(frontSensor) != mshViews.end() && mshViews.find(backSensor) != mshViews.end()) {
+			std::list<IMnemoshemaView *> *frontViews = mshViews[frontSensor];
+			if (frontViews->empty()) {
+				return;
+			}
+
+			TRecordViewStringGridContainer *frontView = static_cast<TRecordViewStringGridContainer *>(frontViews->front());
+
+			std::list<IMnemoshemaView *> *backViews = mshViews[backSensor];
+			if (backViews->empty()) {
+				return;
+			}
+
+			TRecordViewStringGridContainer *backView = static_cast<TRecordViewStringGridContainer *>(backViews->front());
+
+			selection.Top = frontView->row;
+			selection.Bottom = backView->row;
+
+			StringGridSignals->Row = frontView->row;
+		}
+
+		StringGridSignals->Selection = selection;
 	}
 }
 

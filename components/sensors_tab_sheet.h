@@ -6,7 +6,7 @@
 #include "record_view_chart_factory.h"
 #include "mnemoshema_data_manager.h"
 #include "http_data_observer.h"
-#include "file_data_observer.h"
+#include "time_range_data_observer.h"
 #include "mouse_strategy.h"
 #include "chart_time_axis.h"
 //---------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class TSensorsTabSheet :
 
 		sysObserver::IObserver *httpDataObserver;
 
-		sysObserver::IObserver *fileDataObserver;
+		sysObserver::IObserver *timeRangeDataObserver;
 
 		TTimeAxisObserver *timeAxisObserver;
 

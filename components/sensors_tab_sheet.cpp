@@ -37,6 +37,7 @@ __fastcall TSensorsTabSheet::TSensorsTabSheet(
 	//CreateTimeAxisObserver(timeAxis, timeAxisHandler);
 };
 
+//---------------------------------------------------------------------------
 void __fastcall TSensorsTabSheet::RegisterDataObservers(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	mnemoshemaDataManager.AddObserver(this);
 
@@ -88,7 +89,6 @@ TRecordViewChart * __fastcall TSensorsTabSheet::AddChart(const TRecord *record, 
 	TRecordViewChart *chart = static_cast<TRecordViewChart *>(view);
 
 	mouseStrategy->Apply(chart);
-	//chart->PopupMenu = popupMenu;
 
 	return chart;
 }
@@ -109,15 +109,15 @@ __fastcall TSensorsTabSheet::~TSensorsTabSheet() {
 
 	if (mnemoshemaDataManager != NULL) {
 		mnemoshemaDataManager->RemoveObserver(httpDataObserver);
-		mnemoshemaDataManager->RemoveObserver(fileDataObserver);
+		mnemoshemaDataManager->RemoveObserver(timeRangeDataObserver);
 	}
 
 	if (httpDataObserver != NULL) {
 		delete httpDataObserver;
 	}
 
-	if (fileDataObserver != NULL) {
-		delete fileDataObserver;
+	if (timeRangeDataObserver != NULL) {
+		delete timeRangeDataObserver;
 	}
 
 	//maybe do not need to free the memory because the owner component must free the resource
@@ -168,7 +168,7 @@ void __fastcall TSensorsTabSheet::CreateScrollBox() {
 
 // ---------------------------------------------------------------------------
 void __fastcall TSensorsTabSheet::CreateTimeAxis() {
-	timeAxis = new TChartTimeAxis(this);
+	timeAxis = new TChartTimeAxis(this, *mnemoshemaDataManager);
 	/*
 	timeAxis = new TChart(this);
 
@@ -246,10 +246,10 @@ void __fastcall TSensorsTabSheet::CreateHTTPDataObserver(TMnemoshemaDataManager 
 
 //---------------------------------------------------------------------------
 void __fastcall TSensorsTabSheet::CreateFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
-	fileDataObserver = new TFileDataObserver(mshViews);
-	static_cast<TFileDataObserver *>(fileDataObserver)->SetSensorBitViews(mshSensorBitViews);
+	timeRangeDataObserver = new TTimeRangeDataObserver(mshViews);
+	static_cast<TTimeRangeDataObserver *>(timeRangeDataObserver)->SetSensorBitViews(mshSensorBitViews);
 
-	mnemoshemaDataManager.AddObserver(fileDataObserver);
+	mnemoshemaDataManager.AddObserver(timeRangeDataObserver);
 }
 
 //---------------------------------------------------------------------------

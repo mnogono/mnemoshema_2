@@ -26,6 +26,11 @@ void TRecordViewStringGridContainer::CreateControls() {
 
 //---------------------------------------------------------------------------
 void TRecordViewStringGridContainer::DisplayData(std::list<TSensorData *> *data) {
+	if (data == NULL || data->empty()) {
+		DisplayData((TSensorData *)NULL);
+	}
+
+	DisplayData(data->front());
 }
 
 //---------------------------------------------------------------------------

@@ -116,11 +116,11 @@
         <TASM_Debugging>None</TASM_Debugging>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Build>44</VerInfo_Build>
+        <VerInfo_Build>47</VerInfo_Build>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
         <VerInfo_Release>2</VerInfo_Release>
         <VerInfo_MajorVer>2</VerInfo_MajorVer>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.0.2.44;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=2.0.1.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=2.0.2.47;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=2.0.1.0;Comments=</VerInfo_Keys>
         <DynamicRTL>false</DynamicRTL>
         <UsePackages>false</UsePackages>
         <LinkPackageStatics>rtl.lib;vcl.lib;bindengine.lib;bindcomp.lib;dbrtl.lib;bindcompvcl.lib;Tee.lib;vclimg.lib;adortl.lib;DbxCommonDriver.lib;xmlrtl.lib;vclactnband.lib;vclx.lib;IndyProtocols.lib;IndyCore.lib;IndySystem.lib;vcldb.lib</LinkPackageStatics>
@@ -297,6 +297,10 @@
             <DependentOn>mp.h</DependentOn>
             <BuildOrder>63</BuildOrder>
         </CppCompile>
+        <CppCompile Include="observerable_data\observerable_change_time_axis_by_user.cpp">
+            <DependentOn>observerable_data\observerable_change_time_axis_by_user.h</DependentOn>
+            <BuildOrder>126</BuildOrder>
+        </CppCompile>
         <CppCompile Include="observerable_data\observerable_history_date_time.cpp">
             <DependentOn>observerable_data\observerable_history_date_time.h</DependentOn>
             <BuildOrder>85</BuildOrder>
@@ -304,14 +308,6 @@
         <CppCompile Include="observerable_data\observerable_http_device_data.cpp">
             <DependentOn>observerable_data\observerable_http_device_data.h</DependentOn>
             <BuildOrder>87</BuildOrder>
-        </CppCompile>
-        <CppCompile Include="observers\device_file_data_observer.cpp">
-            <DependentOn>observers\device_file_data_observer.h</DependentOn>
-            <BuildOrder>48</BuildOrder>
-        </CppCompile>
-        <CppCompile Include="observers\file_data_observer.cpp">
-            <DependentOn>observers\file_data_observer.h</DependentOn>
-            <BuildOrder>47</BuildOrder>
         </CppCompile>
         <CppCompile Include="observers\file_event_data_observer.cpp">
             <DependentOn>observers\file_event_data_observer.h</DependentOn>
@@ -321,6 +317,10 @@
             <DependentOn>observers\http_data_observer.h</DependentOn>
             <BuildOrder>46</BuildOrder>
         </CppCompile>
+        <CppCompile Include="observers\mnemoshema_data_history_observer.cpp">
+            <DependentOn>observers\mnemoshema_data_history_observer.h</DependentOn>
+            <BuildOrder>128</BuildOrder>
+        </CppCompile>
         <CppCompile Include="observers\string_grid_events_observer.cpp">
             <DependentOn>observers\string_grid_events_observer.h</DependentOn>
             <BuildOrder>117</BuildOrder>
@@ -328,6 +328,10 @@
         <CppCompile Include="observers\time_axis_observer.cpp">
             <DependentOn>observers\time_axis_observer.h</DependentOn>
             <BuildOrder>72</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="observers\time_range_data_observer.cpp">
+            <DependentOn>observers\time_range_data_observer.h</DependentOn>
+            <BuildOrder>125</BuildOrder>
         </CppCompile>
         <CppCompile Include="observers\tree_view_observer.cpp">
             <DependentOn>observers\tree_view_observer.h</DependentOn>
@@ -475,18 +479,6 @@
             <DependentOn>tasks\request_device_event_data_file_format.h</DependentOn>
             <BuildOrder>108</BuildOrder>
         </CppCompile>
-        <CppCompile Include="tasks\request_device_file_data.cpp">
-            <DependentOn>tasks\request_device_file_data.h</DependentOn>
-            <BuildOrder>55</BuildOrder>
-        </CppCompile>
-        <CppCompile Include="tasks\request_file_data.cpp">
-            <DependentOn>tasks\request_file_data.h</DependentOn>
-            <BuildOrder>52</BuildOrder>
-        </CppCompile>
-        <CppCompile Include="tasks\request_file_event_data.cpp">
-            <DependentOn>tasks\request_file_event_data.h</DependentOn>
-            <BuildOrder>73</BuildOrder>
-        </CppCompile>
         <CppCompile Include="tasks\request_http_data.cpp">
             <DependentOn>tasks\request_http_data.h</DependentOn>
             <BuildOrder>53</BuildOrder>
@@ -494,6 +486,10 @@
         <CppCompile Include="tasks\request_mnemoshema_data.cpp">
             <DependentOn>tasks\request_mnemoshema_data.h</DependentOn>
             <BuildOrder>54</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="tasks\request_mnemoshema_data_history.cpp">
+            <DependentOn>tasks\request_mnemoshema_data_history.h</DependentOn>
+            <BuildOrder>127</BuildOrder>
         </CppCompile>
         <CppCompile Include="tasks\request_time_range_data.cpp">
             <DependentOn>tasks\request_time_range_data.h</DependentOn>
@@ -582,6 +578,10 @@
             <DependentOn>..\sys_objects\sysBaseTypes.h</DependentOn>
             <BuildOrder>1</BuildOrder>
         </CppCompile>
+        <CppCompile Include="..\sys_objects\sysControlState.cpp">
+            <DependentOn>..\sys_objects\sysControlState.h</DependentOn>
+            <BuildOrder>125</BuildOrder>
+        </CppCompile>
         <CppCompile Include="..\sys_objects\sysException.cpp">
             <DependentOn>..\sys_objects\sysException.h</DependentOn>
             <BuildOrder>2</BuildOrder>
@@ -650,8 +650,8 @@
             <DependentOn>..\sys_objects\sysVCL.h</DependentOn>
             <BuildOrder>16</BuildOrder>
         </CppCompile>
-        <FormResources Include="signals.dfm"/>
         <FormResources Include="select_report.dfm"/>
+        <FormResources Include="signals.dfm"/>
         <FormResources Include="reports.dfm"/>
         <FormResources Include="login.dfm"/>
         <FormResources Include="db_module.dfm"/>
@@ -733,12 +733,6 @@
                 <DeployFile LocalName=".\Win32\Debug\project_mp.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>project_mp.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName=".\Win32\Debug\project_mp.tds" Configuration="Debug" Class="DebugSymbols">
-                    <Platform Name="Win32">
-                        <RemoteName>project_mp.tds</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

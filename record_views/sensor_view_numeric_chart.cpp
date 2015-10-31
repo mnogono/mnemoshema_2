@@ -69,13 +69,15 @@ void TSensorViewNumericChart::UpdateChart() {
 		   y,
 		   xPrev = d->dataX[0],
 		   yPrev = d->dataY[0] - 1; //-1 just for make true sentence y != yPrev
-	int nullCount;
+
+	double resolution = 1.1/* for improve */ * (GetTimeAxisMaxValue() - GetTimeAxisMinValue()) / (double) (Width);
+	double maxAllowTimeRange = std::max(resolution, sensorPeriodDay);
 
 	for (size_t i = 0; i < d->dataSize; ++i) {
 		y = d->dataY[i] * sensor->powerValue;
 		x = d->dataX[i];
 
-		if ((x - xPrev) > sensorPeriodDay) {
+		if ((x - xPrev) > maxAllowTimeRange /* chart data filtered by resolution */ ) {
 			signal->AddNullXY(xPrev, y, "");
 		} else {
 			signal->AddXY(x, y, "", clBlack);
@@ -102,35 +104,9 @@ void TSensorViewNumericChart::DisplayData(TSensorData *data) {
 		return;
 	}
 
-	//AppendSensorDataToValarray(sensor, data, dataX, dataY, dataSize);
 	chartData.AppendSensorData(sensor, data);
 
 	UpdateChart();
-
-	/*
-	if (data != NULL) {
-		double y = SensorDataToDouble(sensor, data) * sensor->powerValue;
-		double x = sysTime::ConvertToDaysLocalTime(data->timeGMT * sysTime::MSEC2SEC);
-
-		if (signal->XValues->Count > 0) {
-			double xPrev = signal->XValues->Value[signal->XValues->Count - 1];
-			int nullCount = (x - xPrev) / sensorPeriodDay;
-			if (nullCount) {
-				signal->AddNullXY(xPrev, y, "");
-			}
-
-			signal->AddXY(x, y, "", clBlack);
-		} else {
-			signal->AddXY(x, y, "", clBlack);
-		}
-	}
-
-	SetDefaultTitle();
-
-	TrackTimeAxis();
-
-	TrackValueAxis();
-	*/
 }
 
 //---------------------------------------------------------------------------

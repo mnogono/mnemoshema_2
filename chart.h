@@ -131,6 +131,8 @@ public:		// User declarations
 	//request data for all visible charts using current settings of the date-time range
 	void __fastcall RequestData();
 
+	void __fastcall RequestDataByTimeRange(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT);
+
 	void __fastcall SetMnemoshemaDataManager(TMnemoshemaDataManager &mnemoshemaDataManager);
 
 	//void __fastcall OnChartMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta, const TPoint &MousePos, bool &Handled);

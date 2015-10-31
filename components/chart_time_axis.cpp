@@ -9,7 +9,9 @@ TChartTimeAxis::~TChartTimeAxis() {
 
 }
 
-TChartTimeAxis::TChartTimeAxis(TWinControl *owner) {
+TChartTimeAxis::TChartTimeAxis(TWinControl *owner, TMnemoshemaDataManager &mnemoshemaDataManager) {
+	this->mnemoshemaDataManager = &mnemoshemaDataManager;
+
 	timeAxis = new TChart(owner);
 
 	timeAxis->Parent = owner;
@@ -58,10 +60,15 @@ int TChartTimeAxis::GetWidth() {
 }
 
 //---------------------------------------------------------------------------
-void TChartTimeAxis::SetTimeAxisBounds(/*TObject *sender, */double dt1LocalTime, double dt2LocalTime) {
+void TChartTimeAxis::SetTimeAxisBounds(double dt1LocalTime, double dt2LocalTime, bool requestData) {
 	timeAxis->BottomAxis->SetMinMax(dt1LocalTime, dt2LocalTime);
 
 	NotifyObservers(&TObserverableHistoryDateTime(dt1LocalTime, dt2LocalTime));
+
+	if (requestData) {
+		mnemoshemaDataManager->NotifyObservers(&TObserverableChangeTimeAxisByUser(dt1LocalTime, dt2LocalTime));
+	}
+
 }
 
 //---------------------------------------------------------------------------

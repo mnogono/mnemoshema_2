@@ -171,7 +171,7 @@ void __fastcall TFormChart::RestoreOpenedPages() {
 					continue;
 				}
 
-				TRecordViewChart *recordViewChart = sensorsTabSheet->AddChart(record, activeMouseStrategy/*, PopupMenuChart*/);
+				TRecordViewChart *recordViewChart = sensorsTabSheet->AddChart(record, activeMouseStrategy);
 				if (recordViewChart == NULL) {
 					continue;
 				}
@@ -660,7 +660,7 @@ void __fastcall TFormChart::btnZoomOutClick(TObject *Sender) {
 
 	if (dt1LocalTime != 0 && dt2LocalTime != 0) {
 		TSensorsTabSheet *activePage = static_cast<TSensorsTabSheet *>(PageControl->ActivePage);
-		activePage->timeAxis->SetTimeAxisBounds(dt1LocalTime, dt2LocalTime);
+		activePage->timeAxis->SetTimeAxisBounds(dt1LocalTime, dt2LocalTime, true);
 	}
 
 
@@ -780,7 +780,6 @@ void TFormChart::UpdateData(sysObserverable::IObserverable *data) {
 		TObserverableHistoryDateTime *historyDateTime = static_cast<TObserverableHistoryDateTime *>(data);
 
 		sensorsTabSheet->timeAxis->SetTimeAxisBounds(historyDateTime->dt1LocalTime, historyDateTime->dt2LocalTime);
-
 	} else if (data->GetObserverableType() == TObserverableTypes::NEW_VERTICAL_LINE) {
 		SetChartsMouseStrategy(mouseStrategyHand);
 		btnHand->Down = true;
@@ -793,6 +792,17 @@ void TFormChart::UpdateData(sysObserverable::IObserverable *data) {
 		SetChartsMouseStrategy(mouseStrategyHand);
 		btnHand->Down = true;
 
+	} else if (data->GetObserverableType() == TObserverableTypes::TIME_AXIS_CHANGE_BY_USER) {
+		//TSensorsTabSheet *sensorsTabSheet = static_cast<TSensorsTabSheet *>(PageControl->ActivePage);
+		TObserverableChangeTimeAxisByUser *changeTimeAxisByUser = static_cast<TObserverableChangeTimeAxisByUser *>(data);
+
+		std::set<const TSensor *> sensors = GetVisibleSensors();
+		if (sensors.size() == 0) {
+			return;
+		}
+
+		//sensorsTabSheet->timeAxis->SetTimeAxisBounds(historyDateTime->dt1LocalTime, historyDateTime->dt2LocalTime);
+		RequestDataByTimeRange(sensors, changeTimeAxisByUser->GetDateTime1AsGMT(), changeTimeAxisByUser->GetDateTime2AsGMT());
 	}
 }
 
@@ -943,12 +953,28 @@ void __fastcall TFormChart::RequestData() {
 		dt2GMT = fLocalTimeBiasInDays + floor(Date2->Date.Val) + Time2->Time.Val - floor(Time2->Time.Val);
 	}
 
+	RequestDataByTimeRange(sensors, dt1GMT, dt2GMT);
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormChart::RequestDataByTimeRange(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT) {
+	if (sensors.size() == 0) {
+		return;
+	}
+
+	static double fLocalTimeBiasInDays = sysTime::GetLocalTimeBias() * sysTime::SEC2DAY;
+
 	if (dt1GMT != 0 && dt2GMT != 0) {
-		REQUEST_TIME_RANGE_DATA(sensors, dt1GMT, dt2GMT);
+		TSensorsTabSheet *sensorsTabSheet = dynamic_cast<TSensorsTabSheet *>(PageControl->ActivePage);
+		int timeAxisWidth = sensorsTabSheet->timeAxis->GetWidth();
+		double resolution = (dt2GMT - dt1GMT) / (double) timeAxisWidth;
+
+		REQUEST_TIME_RANGE_DATA(sensors, dt1GMT, dt2GMT, resolution);
 
 		TObserverableHistoryDateTime observerableHistorydateTime(dt1GMT - fLocalTimeBiasInDays, dt2GMT - fLocalTimeBiasInDays);
 		mnemoshemaDataManager->NotifyObservers(&observerableHistorydateTime);
 	}
+
 }
 
 //---------------------------------------------------------------------------

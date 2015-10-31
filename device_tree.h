@@ -2,6 +2,8 @@
 
 #ifndef device_treeH
 #define device_treeH
+
+#include "record.h"
 //---------------------------------------------------------------------------
 
 struct TUpdateTreeViewOptions {
@@ -24,5 +26,9 @@ void FilterTree(
 	const String &filter);
 
 void BuildTreeViewDevice(TTreeView *TreeViewDevice);
+
+//find record in tree view device node data, return index of node or -1 if not found
+int FindRecordInTreeViewDevice(TTreeView *TreeViewDevice, const TRecord *record);
+
 
 #endif

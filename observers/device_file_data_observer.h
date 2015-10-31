@@ -6,7 +6,6 @@
 #include "request_device_file_data.h"
 #include "mnemoshema_view.h"
 #include "record_view.h"
-//#include "observerable_types.h"
 //---------------------------------------------------------------------------
 class TDeviceFileDataObserver : public sysObserver::IObserver {
 	protected:

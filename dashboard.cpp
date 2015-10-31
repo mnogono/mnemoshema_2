@@ -19,6 +19,12 @@ __fastcall TFormDashboard::TFormDashboard(TComponent* Owner)
 }
 
 //---------------------------------------------------------------------------
+void __fastcall TFormDashboard::CreateTimeRangeDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
+	timeRangeDataObserver = new TTimeRangeDataObserver(mshViews);
+	mnemoshemaDataManager.AddObserver(timeRangeDataObserver);
+}
+
+//---------------------------------------------------------------------------
 void __fastcall TFormDashboard::CreateHTTPDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	httpDataObserver = new THTTPDataObserver(mshViews);
 	mnemoshemaDataManager.AddObserver(httpDataObserver);
@@ -29,6 +35,12 @@ void __fastcall TFormDashboard::CreateHTTPDataObserver(TMnemoshemaDataManager &m
 }
 
 //---------------------------------------------------------------------------
+void __fastcall TFormDashboard::CreateMnemoshemaDataHistoryObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
+	mnemoshemaDataHistoryObserver = new TMnemoshemaDataHistoryObserver(mshViews);
+	mnemoshemaDataManager.AddObserver(mnemoshemaDataHistoryObserver);
+}
+
+//---------------------------------------------------------------------------
 /*
 void __fastcall TFormDashboard::CreateFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	fileDataObserver = new TFileDataObserver(mnemoshemaDataManager, recordViews);
@@ -36,12 +48,12 @@ void __fastcall TFormDashboard::CreateFileDataObserver(TMnemoshemaDataManager &m
 }
 */
 //---------------------------------------------------------------------------
-void __fastcall TFormDashboard::CreateDeviceFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
 /*
+void __fastcall TFormDashboard::CreateDeviceFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	deviceFileDataObserver = new TDeviceFileDataObserver(mnemoshemaDataManager, mshViews);
 	mnemoshemaDataManager.AddObserver(deviceFileDataObserver);
-*/
 }
+*/
 
 //---------------------------------------------------------------------------
 void __fastcall TFormDashboard::FormCreate(TObject *Sender)
@@ -66,7 +78,7 @@ void __fastcall TFormDashboard::AddSensorView(TWinControl *parent, TRecord *reco
 		sensor = GetSensor(sensorBit->sensor_id);
 	}
 
-	IMnemoshemaView *mshView = TSensorViewFactory::Build(parent, record/*, InitCreatedRecordView*/);
+	IMnemoshemaView *mshView = TSensorViewFactory::Build(parent, record);
 	if (mshView == NULL) {
 		return;
 	}
@@ -80,54 +92,10 @@ void __fastcall TFormDashboard::AddSensorView(TWinControl *parent, TRecord *reco
 
 // ---------------------------------------------------------------------------
 void TFormDashboard::InitCreatedRecordView(TSensorView *createdRecordView) {
-	/*
-	String autoSensorHint = EmptyTo(DataModuleMP->GetSetting("auto_sensor_hint"), "1");
-    int enableAutoSensorHint = StrToInt(autoSensorHint);
-
-	if (dynamic_cast<TEdit *>(createdRecordView->viewControl)){
-		TEdit *control = (TEdit *)createdRecordView->viewControl;
-		if (createdRecordView->record->record_type == RECORD_TYPE_SENSOR){
-			TSensor *sensor = (TSensor *)createdRecordView->record;
-			if (enableAutoSensorHint) {
-				control->Hint = GetSensorTreeItemName(sensor);
-			} else {
-				control->Hint = sensor->desc;
-			}
-
-
-		} else if (createdRecordView->record->record_type == RECORD_TYPE_SENSOR_BIT){
-			TSensorBit *sensorBit = (TSensorBit *)createdRecordView->record;
-			if (enableAutoSensorHint) {
-                control->Hint = GetSensorBitTreeItemName(sensorBit);
-            } else {
-				control->Hint = sensorBit->desc;
-            }
-		}
-
-		control->ReadOnly = true;
-		control->ShowHint = true;
-
-		control->PopupMenu = FormMP->PopupMenuSensor;
-
-		control->OnMouseDown = FormMP->PageControlMP->OnMouseDown;
-		control->OnMouseUp = FormMP->PageControlMP->OnMouseUp;
-		control->OnMouseMove = FormMP->PageControlMP->OnMouseMove;
-
-	} else if (dynamic_cast<TImage *>(createdRecordView->viewControl)){
-		TImage *control = (TImage *)createdRecordView->viewControl;
-
-        control->PopupMenu = FormMP->PopupMenuSensor;
-
-		control->OnMouseDown = FormMP->PageControlMP->OnMouseDown;
-		control->OnMouseUp = FormMP->PageControlMP->OnMouseUp;
-		control->OnMouseMove = FormMP->PageControlMP->OnMouseMove;
-	}
-	*/
 }
 
 // ---------------------------------------------------------------------------
 void __fastcall OnDashboardMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift, int X, int Y) {
-
 }
 
 // ---------------------------------------------------------------------------
@@ -261,11 +229,24 @@ void __fastcall TFormDashboard::CreateMnemoshemsPages() {
 void __fastcall TFormDashboard::SaveLastUserSettings() {
 	//save user settings before close the application
 	sysApp::SaveFormSettings(this);
+
+	String prefix = L"dashboard_";
+	sysApp::SaveControlState(CheckBoxDataHistory, prefix);
+	sysApp::SaveControlState(DateDashboardHistory, prefix);
+	sysApp::SaveControlState(TimeDashboardHistory, prefix);
 }
 
 //---------------------------------------------------------------------------
 void __fastcall TFormDashboard::RestoreLastUserSettings() {
 //	sysApp::RestoreFormSettings(this);
+	std::list<TControl *> controls;
+	controls.push_back(CheckBoxDataHistory);
+	controls.push_back(DateDashboardHistory);
+	controls.push_back(TimeDashboardHistory);
+
+	String prefix = L"dashboard_";
+	sysApp::RestoreControlsState(controls, prefix);
+
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormDashboard::FormDestroy(TObject *Sender) {
@@ -276,7 +257,7 @@ void __fastcall TFormDashboard::FormDestroy(TObject *Sender) {
 void __fastcall TFormDashboard::SetMnemoshemaDataManager(TMnemoshemaDataManager &mnemoshemaDataManager) {
 	CreateHTTPDataObserver(mnemoshemaDataManager);
 
-	//CreateFileDataObserver(mnemoshemaDataManager);
+	CreateTimeRangeDataObserver(mnemoshemaDataManager);
 
 	//CreateDeviceFileDataObserver(mnemoshemaDataManager);
 }
@@ -300,4 +281,43 @@ void __fastcall TFormDashboard::FormShow(TObject *Sender) {
 	}
 	*/
 }
+
+//---------------------------------------------------------------------------
+void __fastcall TFormDashboard::RequestDataMnemoshemaHistory() {
+	if (CheckBoxDataHistory->Checked == false) {
+		return;
+	}
+
+	std::set<const TSensor *> sensors;
+	for (std::list<TSensor *>::iterator i = SENSORS.begin(), iEnd = SENSORS.end(); i != iEnd; ++i) {
+		sensors.insert(*i);
+	}
+
+	static double fLocalTimeBiasInDays = sysTime::GetLocalTimeBias() * sysTime::SEC2DAY;
+
+	double dtGMT = fLocalTimeBiasInDays + floor(DateDashboardHistory->Date.Val)/*date*/ + TimeDashboardHistory->Time.Val - floor(TimeDashboardHistory->Time.Val) /*time*/;
+
+	REQUEST_MNEMOSHEMA_DATA(sensors, dtGMT);
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormDashboard::CheckBoxDataHistoryClick(TObject *Sender) {
+	RequestDataMnemoshemaHistory();
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormDashboard::ButtonRequestDataMnemoshemaHistoryClick(TObject *Sender) {
+	RequestDataMnemoshemaHistory();
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormDashboard::DateDashboardHistoryChange(TObject *Sender) {
+	RequestDataMnemoshemaHistory();
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TFormDashboard::TimeDashboardHistoryChange(TObject *Sender) {
+	RequestDataMnemoshemaHistory();
+}
+//---------------------------------------------------------------------------
 

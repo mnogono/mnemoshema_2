@@ -29,10 +29,12 @@ __published:	// IDE-managed Components
 	void __fastcall FormDestroy(TObject *Sender);
 private:
 	sysObserver::IObserver *httpDataObserver;
-	sysObserver::IObserver *fileDataObserver;
+	sysObserver::IObserver *timeRangeDataObserver;
+	sysObserver::IObserver *mnemoshemaDataHistoryObserver;
 
 	void __fastcall CreateHTTPDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
-	void __fastcall CreateFileDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
+	void __fastcall CreateTimeRangeDataObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
+	void __fastcall CreateMnemoshemaDataHistoryObserver(TMnemoshemaDataManager &mnemoshemaDataManager);
 public:
 	//record and string grid signals row
 	std::map<const TSensor *, std::list<IMnemoshemaView *> *> mshViews;

@@ -10,6 +10,7 @@ TTaskRequestFileData::TTaskRequestFileData() /*: dt1GMT(0.0), dt2GMT(0.0) */{
 	dt1GMT = 0;
 	dt2GMT = 0;
 	sensor = NULL;
+	resolution = 0;
 }
 
 //---------------------------------------------------------------------------

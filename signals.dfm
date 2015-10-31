@@ -30,7 +30,7 @@ object FormSignals: TFormSignals
     ColCount = 3
     FixedCols = 0
     RowCount = 2
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goThumbTracking]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goRowSelect, goThumbTracking]
     TabOrder = 0
   end
 end

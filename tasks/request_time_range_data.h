@@ -17,6 +17,9 @@ class TTaskRequestTimeRangeData : public TTaskRequestMnemoshemaData {
 		//output data
 		std::map<const TSensor *, std::list<TSensorData *> *> data;
 
+		//data resolution in days
+		double resolution;
+
 	public:
 		virtual void CleanUp();
 };

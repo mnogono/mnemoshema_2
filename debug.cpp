@@ -38,26 +38,18 @@ void __fastcall TFormDebug::TimerSensorDataPoolUpdateTimer(TObject *Sender)
 {
 	LabelSensorDataPoolUsed->Caption = IntToStr((int)SENSOR_DATA_POOL.GetUsedSize());
 	LabelSensorDataPoolAvailable->Caption = IntToStr((int)SENSOR_DATA_POOL.GetAvailableSize());
-	//LabelThreadPoolTasks->Caption = IntToStr((int)threadPool->GetTaskQueueCount());
+
 	LabelThreadPoolTasks->Caption = IntToStr((int)THREAD_POOL->GetTaskQueueCount());
 
-	//LabelHTTPRequestPoolUsed->Caption = IntToStr((int)httpRequestPool->GetUsedSize());
-	LabelHTTPRequestPoolUsed->Caption = IntToStr((int)HTTP_REQUEST_POOL->GetUsedSize());
-	//LabelHTTPRequestPoolAvailable->Caption = IntToStr((int)httpRequestPool->GetAvailableSize());
-	LabelHTTPRequestPoolAvailable->Caption = IntToStr((int)HTTP_REQUEST_POOL->GetAvailableSize());
-	//LabelFileRequestPoolUsed->Caption = IntToStr((int)fileRequestPool->GetUsedSize());
-	LabelFileRequestPoolUsed->Caption = IntToStr((int)FILE_REQUEST_POOL->GetUsedSize());
-	//LabelFileRequestPoolAvailable->Caption = IntToStr((int)fileRequestPool->GetAvailableSize());
-	LabelFileRequestPoolAvailable->Caption = IntToStr((int)FILE_REQUEST_POOL->GetAvailableSize());
-	/*
-	LabelDeviceFileRequestPoolUsed->Caption = IntToStr((int)deviceFileRequestPool->GetUsedSize());
-	LabelDeviceFileRequestPoolAvailable->Caption = IntToStr((int)deviceFileRequestPool->GetAvailableSize());
-	*/
 
-	/*
-	LabelDeviceFileRequestPoolUsed->Caption = IntToStr((int)requestPool->GetUsedSize());
-	LabelDeviceFileRequestPoolAvailable->Caption = IntToStr((int)requestPool->GetAvailableSize());
-	*/
+	LabelHTTPRequestPoolUsed->Caption = IntToStr((int)HTTP_REQUEST_POOL->GetUsedSize());
+
+	LabelHTTPRequestPoolAvailable->Caption = IntToStr((int)HTTP_REQUEST_POOL->GetAvailableSize());
+
+	//LabelFileRequestPoolUsed->Caption = IntToStr((int)FILE_REQUEST_POOL->GetUsedSize());
+
+	//LabelFileRequestPoolAvailable->Caption = IntToStr((int)FILE_REQUEST_POOL->GetAvailableSize());
+
 	LabelSensorEventDataPoolUsed->Caption = IntToStr((int)SENSOR_EVENT_DATA_POOL.GetUsedSize());
 	LabelSensorEventDataPoolAvailable->Caption = IntToStr((int)SENSOR_EVENT_DATA_POOL.GetAvailableSize());
 }

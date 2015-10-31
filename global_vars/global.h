@@ -66,8 +66,13 @@ global pool of sensor file request
 each sensor file request executed by one of thread from THREAD_POOL
 FILE_REQUEST_POOL created by mp module
 */
+/*
+old request pool, does not using any more
 class TTaskRequestFileData;
 extern sysPatterns::TPool<TTaskRequestFileData> *FILE_REQUEST_POOL;
+*/
+
+
 
 /*
 global pool of http request
@@ -94,13 +99,28 @@ class TTaskRequestDeviceEventDataFileFormat;
 extern sysPatterns::TPool<TTaskRequestDeviceEventDataFileFormat> *DEVICE_EVENT_DATA_FILE_FORMAT_REQUEST_POOL;
 
 /*
+global pool of device binary event data files
+each request executed by one of thread from THREAD_POOL
+MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL created by mp module
+*/
+class TTaskRequestMnemoshemaDataHistory;
+extern sysPatterns::TPool<TTaskRequestMnemoshemaDataHistory> *MNEMOSHEMA_DATA_HISTORY_REQUEST_POOL;
+
+/*
 global ptr for function of create request
 task for sensor binary data (FILE_REQUEST_POOL) or
 task for device binary data (DEVICE_DATA_FILE_FORMAT_REQUEST_POOL)
 initialized in mp module
 */
-typedef void (RequestTimeRangeData)(std::set<const TSensor *> &sensors, double, double);
+typedef void (RequestTimeRangeData)(std::set<const TSensor *> &sensors, double dt1GMT, double dt2GMT, double resolution);
 extern RequestTimeRangeData *REQUEST_TIME_RANGE_DATA;
+
+/*
+global ptr for function of create request
+task for all sensors data for dashboard
+*/
+typedef void (RequestMnemoshemaData)(std::set<const TSensor *> &sensors, double dtGMT);
+extern RequestMnemoshemaData *REQUEST_MNEMOSHEMA_DATA;
 
 //find and return ptr to sensor or NULL
 TSensor * GetSensor(const String &uuid);

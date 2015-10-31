@@ -202,7 +202,7 @@ void __fastcall TMouseStrategyHand::OnChartMouseUp(TObject *Sender, TMouseButton
 		}
 	} else {
 		TSensorsTabSheet *activePage = static_cast<TSensorsTabSheet *>(chartPageControl->ActivePage);
-		activePage->timeAxis->SetTimeAxisBounds(chart->BottomAxis->Minimum, chart->BottomAxis->Maximum);
+		activePage->timeAxis->SetTimeAxisBounds(chart->BottomAxis->Minimum, chart->BottomAxis->Maximum, true);
 	}
 
 	mouseInfo.button = mbMiddle;

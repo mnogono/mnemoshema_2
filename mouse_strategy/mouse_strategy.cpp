@@ -147,7 +147,7 @@ void __fastcall TMouseStrategy::OnChartMouseMove(TObject *Sender, TShiftState Sh
 	//check is marker under mouse position
 	//change the cursor
 
-	//OutputDebugString(IntToStr(X).c_str());
+
 
 
 }
